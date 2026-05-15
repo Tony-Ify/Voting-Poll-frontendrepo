@@ -1,9 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { environment } from '../../environments/environment.prod';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  state: string;
+  role: 'user' | 'admin';
+}
 
 export interface AuthResponse {
   id: number;
@@ -15,33 +22,18 @@ export interface AuthResponse {
   expiresIn: string;
 }
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  state: string;
-  role: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
-  private currentUserSubject = new BehaviorSubject<User | null>(
-    this.getUserFromStorage(),
-  );
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(!!this.getToken());
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(
-    !!this.getToken(),
-  );
+  public currentUser$ = this.currentUserSubject.asObservable();
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {
+  constructor(private http: HttpClient) {
     this.verifyToken();
   }
 
@@ -59,10 +51,8 @@ export class AuthService {
         state,
       })
       .pipe(
-        map(response => {
-          this.setSession(response);
-          return response;
-        }),
+        tap(response => this.handleAuthResponse(response)),
+        catchError(error => this.handleError(error)),
       );
   }
 
@@ -70,10 +60,8 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
-        map(response => {
-          this.setSession(response);
-          return response;
-        }),
+        tap(response => this.handleAuthResponse(response)),
+        catchError(error => this.handleError(error)),
       );
   }
 
@@ -82,16 +70,39 @@ export class AuthService {
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
-    this.router.navigate(['/login']);
+  }
+
+  verifyToken(): void {
+    const token = this.getToken();
+    if (!token) {
+      return;
+    }
+
+    this.http
+      .get<{ valid: boolean }>(`${this.apiUrl}/verify`)
+      .pipe(
+        catchError(() => {
+          this.logout();
+          return throwError(() => new Error('Token invalid'));
+        }),
+      )
+      .subscribe();
+  }
+
+  refreshToken(): Observable<{ accessToken: string }> {
+    return this.http.post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {}).pipe(
+      tap(response => {
+        localStorage.setItem('token', response.accessToken);
+      }),
+      catchError(error => {
+        this.logout();
+        return throwError(() => error);
+      }),
+    );
   }
 
   getToken(): string | null {
     return localStorage.getItem('token');
-  }
-
-  setToken(token: string): void {
-    localStorage.setItem('token', token);
-    this.isAuthenticatedSubject.next(true);
   }
 
   isAuthenticated(): boolean {
@@ -102,25 +113,15 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  refreshToken(): Observable<{ accessToken: string }> {
-    return this.http
-      .post<{ accessToken: string }>(`${this.apiUrl}/refresh`, {})
-      .pipe(
-        map(response => {
-          this.setToken(response.accessToken);
-          return response;
-        }),
-      );
-  }
-
-  private setSession(response: AuthResponse): void {
+  private handleAuthResponse(response: AuthResponse): void {
     const user: User = {
       id: response.id,
       name: response.name,
       email: response.email,
       state: response.state,
-      role: response.role,
+      role: response.role as 'user' | 'admin',
     };
+
     localStorage.setItem('token', response.accessToken);
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSubject.next(user);
@@ -128,23 +129,19 @@ export class AuthService {
   }
 
   private getUserFromStorage(): User | null {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
   }
 
-  private verifyToken(): void {
-    if (this.getToken()) {
-      this.http
-        .get<{ valid: boolean; user: User }>(`${this.apiUrl}/verify`)
-        .subscribe(
-          response => {
-            this.currentUserSubject.next(response.user);
-            this.isAuthenticatedSubject.next(true);
-          },
-          error => {
-            this.logout();
-          },
-        );
+  private handleError(error: any): Observable<never> {
+    let errorMessage = 'An error occurred';
+
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = error.error.message;
+    } else {
+      errorMessage = error.error?.message || error.statusText || errorMessage;
     }
+
+    return throwError(() => new Error(errorMessage));
   }
 }

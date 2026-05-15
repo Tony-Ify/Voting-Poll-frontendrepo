@@ -1,1 +1,78 @@
-<p>poll-list works!</p>
+<div class="polls-container">
+  <div class="polls-header">
+    <h2>Polls</h2>
+    <p class="subtitle">Participate in active polls and view results</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button 
+      class="tab" 
+      [class.active]="activeTab === 'active'"
+      (click)="switchTab('active')"
+    >
+      Active Polls
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="activeTab === 'closed'"
+      (click)="switchTab('closed')"
+    >
+      Closed Polls
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading polls...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+    <button class="btn btn-sm btn-secondary" (click)="loadPolls()">Retry</button>
+  </div>
+
+  <!-- Polls List -->
+  <div class="polls-grid" *ngIf="!loading && !error">
+    <div *ngIf="polls.length === 0" class="empty-state">
+      <p>No {{ activeTab }} polls found</p>
+      <p class="empty-subtitle">Check back later for new polls</p>
+    </div>
+
+    <div *ngFor="let poll of polls" class="poll-card">
+      <div class="poll-header">
+        <h3>{{ poll.title }}</h3>
+        <span class="badge" [class.active]="poll.status === 'active'">
+          {{ poll.status | uppercase }}
+        </span>
+      </div>
+
+      <p class="poll-description">{{ poll.description }}</p>
+
+      <div class="poll-meta">
+        <span class="option-count">{{ poll.options.length }} options</span>
+        <span class="vote-count" *ngIf="poll.totalVotes">
+          {{ poll.totalVotes }} votes
+        </span>
+      </div>
+
+      <div class="poll-actions">
+        <button 
+          *ngIf="poll.status === 'active'" 
+          class="btn btn-primary"
+          (click)="votePoll(poll.id)"
+        >
+          Vote Now
+        </button>
+        <button 
+          class="btn btn-secondary"
+          (click)="viewResults(poll.id)"
+        >
+          View Results
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

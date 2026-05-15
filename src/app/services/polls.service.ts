@@ -4,12 +4,8 @@ import { ApiService } from './api.service';
 
 export interface PollOption {
   id: number;
-  pollId: number;
   optionText: string;
   displayOrder: number;
-  createdAt: Date;
-  voteCount?: number;
-  percentage?: number;
 }
 
 export interface Poll {
@@ -17,64 +13,61 @@ export interface Poll {
   title: string;
   description: string;
   status: 'active' | 'closed';
-  createdById: number;
-  createdBy: {
-    id: number;
-    name: string;
-    email: string;
-  };
+  createdBy: { id: number; name: string };
   options: PollOption[];
   totalVotes?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  closedAt?: Date;
-}
-
-export interface CreatePollRequest {
-  title: string;
-  description?: string;
-  options: { optionText: string; displayOrder?: number }[];
+  createdAt?: string;
+  closedAt?: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class PollsService {
+  private endpoint = '/polls';
+
   constructor(private apiService: ApiService) {}
 
-  getAllPolls(status?: 'active' | 'closed'): Observable<Poll[]> {
-    const endpoint = status ? `/polls?status=${status}` : '/polls';
-    return this.apiService.get<Poll[]>(endpoint);
+  getAllPolls(): Observable<Poll[]> {
+    return this.apiService.get<Poll[]>(this.endpoint);
   }
 
   getActivePools(): Observable<Poll[]> {
-    return this.apiService.get<Poll[]>('/polls/active');
+    return this.apiService.get<Poll[]>(`${this.endpoint}?status=active`);
   }
 
   getClosedPools(): Observable<Poll[]> {
-    return this.apiService.get<Poll[]>('/polls/closed');
+    return this.apiService.get<Poll[]>(`${this.endpoint}?status=closed`);
   }
 
   getPollById(id: number): Observable<Poll> {
-    return this.apiService.get<Poll>(`/polls/${id}`);
+    return this.apiService.get<Poll>(`${this.endpoint}/${id}`);
   }
 
-  createPoll(poll: CreatePollRequest): Observable<Poll> {
-    return this.apiService.post<Poll>('/polls', poll);
+  createPoll(data: {
+    title: string;
+    description: string;
+    options: { optionText: string }[];
+  }): Observable<Poll> {
+    return this.apiService.post<Poll>(this.endpoint, data);
   }
 
-  updatePoll(id: number, poll: Partial<CreatePollRequest>): Observable<Poll> {
-    return this.apiService.put<Poll>(`/polls/${id}`, poll);
-  }
-
-  updatePollStatus(
+  updatePoll(
     id: number,
-    status: 'active' | 'closed',
+    data: {
+      title: string;
+      description: string;
+      options: { optionText: string }[];
+    },
   ): Observable<Poll> {
-    return this.apiService.patch<Poll>(`/polls/${id}/status`, { status });
+    return this.apiService.put<Poll>(`${this.endpoint}/${id}`, data);
+  }
+
+  updatePollStatus(id: number, status: 'active' | 'closed'): Observable<Poll> {
+    return this.apiService.patch<Poll>(`${this.endpoint}/${id}/status`, { status });
   }
 
   deletePoll(id: number): Observable<void> {
-    return this.apiService.delete<void>(`/polls/${id}`);
+    return this.apiService.delete<void>(`${this.endpoint}/${id}`);
   }
 }

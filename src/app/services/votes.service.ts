@@ -8,10 +8,10 @@ export interface Vote {
   pollId: number;
   optionId: number;
   state: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
-export interface PollResult {
+export interface VoteStats {
   optionId: number;
   optionText: string;
   voteCount: number;
@@ -21,44 +21,23 @@ export interface PollResult {
 export interface PollResults {
   pollId: number;
   totalVotes: number;
-  results: PollResult[];
+  stats: VoteStats[];
 }
 
-export interface PollResultsByState {
-  pollId: number;
-  state: string;
-  totalVotes: number;
-  results: PollResult[];
-}
-
-export interface StateStats {
-  state: string;
-  voteCount: number;
-}
-
-export interface PollResultsByAllStates {
-  pollId: number;
-  totalVotes: number;
-  optionStats: Array<{
-    optionId: number;
-    optionText: string;
-    votesByState: { [state: string]: number };
-    totalVotes: number;
-  }>;
+export interface AllStatesVoteResultsDto {
+  [key: string]: VoteStats[];
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class VotesService {
+  private endpoint = '/votes';
+
   constructor(private apiService: ApiService) {}
 
-  submitVote(
-    pollId: number,
-    optionId: number,
-    state: string,
-  ): Observable<Vote> {
-    return this.apiService.post<Vote>('/votes', {
+  submitVote(pollId: number, optionId: number, state: string): Observable<Vote> {
+    return this.apiService.post<Vote>(this.endpoint, {
       pollId,
       optionId,
       state,
@@ -66,28 +45,22 @@ export class VotesService {
   }
 
   getUserPollVote(pollId: number): Observable<Vote | null> {
-    return this.apiService.get<Vote | null>(`/votes/user/${pollId}`);
+    return this.apiService.get<Vote>(`${this.endpoint}/poll/${pollId}/user-vote`);
   }
 
   getPollVotes(pollId: number): Observable<Vote[]> {
-    return this.apiService.get<Vote[]>(`/votes/poll/${pollId}`);
+    return this.apiService.get<Vote[]>(`${this.endpoint}/poll/${pollId}`);
   }
 
   getPollResults(pollId: number): Observable<PollResults> {
     return this.apiService.get<PollResults>(`/results/${pollId}`);
   }
 
-  getPollResultsByState(pollId: number, state: string): Observable<PollResultsByState> {
-    return this.apiService.get<PollResultsByState>(
-      `/results/${pollId}/by-state?state=${state}`,
-    );
+  getPollResultsByState(pollId: number, state: string): Observable<PollResults> {
+    return this.apiService.get<PollResults>(`/results/${pollId}?state=${state}`);
   }
 
-  getPollResultsByAllStates(
-    pollId: number,
-  ): Observable<PollResultsByAllStates> {
-    return this.apiService.get<PollResultsByAllStates>(
-      `/results/${pollId}/all-states`,
-    );
+  getPollResultsByAllStates(pollId: number): Observable<AllStatesVoteResultsDto> {
+    return this.apiService.get<AllStatesVoteResultsDto>(`/results/${pollId}/by-states`);
   }
 }

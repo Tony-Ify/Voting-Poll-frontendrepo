@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environment.prod';
-import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -11,67 +10,60 @@ import { AuthService } from './auth.service';
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    });
+  get<T>(endpoint: string, params?: any): Observable<T> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+
+    return this.http
+      .get<T>(`${this.apiUrl}${endpoint}`, { params: httpParams })
+      .pipe(catchError(error => this.handleError(error)));
   }
 
-  get<T>(endpoint: string): Observable<T> {
+  post<T>(endpoint: string, data: any): Observable<T> {
     return this.http
-      .get<T>(`${this.apiUrl}${endpoint}`, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError(this.handleError));
+      .post<T>(`${this.apiUrl}${endpoint}`, data)
+      .pipe(catchError(error => this.handleError(error)));
   }
 
-  post<T>(endpoint: string, body: any): Observable<T> {
+  put<T>(endpoint: string, data: any): Observable<T> {
     return this.http
-      .post<T>(`${this.apiUrl}${endpoint}`, body, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError(this.handleError));
+      .put<T>(`${this.apiUrl}${endpoint}`, data)
+      .pipe(catchError(error => this.handleError(error)));
   }
 
-  put<T>(endpoint: string, body: any): Observable<T> {
+  patch<T>(endpoint: string, data: any): Observable<T> {
     return this.http
-      .put<T>(`${this.apiUrl}${endpoint}`, body, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError(this.handleError));
-  }
-
-  patch<T>(endpoint: string, body: any): Observable<T> {
-    return this.http
-      .patch<T>(`${this.apiUrl}${endpoint}`, body, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError(this.handleError));
+      .patch<T>(`${this.apiUrl}${endpoint}`, data)
+      .pipe(catchError(error => this.handleError(error)));
   }
 
   delete<T>(endpoint: string): Observable<T> {
     return this.http
-      .delete<T>(`${this.apiUrl}${endpoint}`, {
-        headers: this.getHeaders(),
-      })
-      .pipe(catchError(this.handleError));
+      .delete<T>(`${this.apiUrl}${endpoint}`)
+      .pipe(catchError(error => this.handleError(error)));
   }
 
-  private handleError(error: any) {
+  private handleError(error: any): Observable<never> {
     let errorMessage = 'An error occurred';
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
       errorMessage = error.error.message;
+    } else if (error.status === 401) {
+      errorMessage = 'Unauthorized. Please login again.';
+    } else if (error.status === 403) {
+      errorMessage = 'Forbidden. You do not have permission.';
+    } else if (error.status === 404) {
+      errorMessage = 'Not found.';
     } else {
-      // Server-side error
       errorMessage = error.error?.message || error.statusText || errorMessage;
     }
 

@@ -1,1 +1,79 @@
-<p>poll-detail works!</p>
+<div class="poll-detail-container">
+  <!-- Back Button -->
+  <button class="btn btn-secondary" (click)="goBack()">← Back to Polls</button>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading poll...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="alert alert-danger" *ngIf="error && !loading">
+    {{ error }}
+    <button class="btn btn-sm" (click)="goBack()">Go Back</button>
+  </div>
+
+  <!-- Poll Detail -->
+  <div class="poll-detail" *ngIf="poll && !loading">
+    <div class="poll-header">
+      <h2>{{ poll.title }}</h2>
+      <span class="status-badge" [class.active]="poll.status === 'active'">
+        {{ poll.status | uppercase }}
+      </span>
+    </div>
+
+    <p class="poll-description">{{ poll.description }}</p>
+
+    <div class="poll-meta">
+      <span>Created by: <strong>{{ poll.createdBy.name }}</strong></span>
+      <span>Options: <strong>{{ poll.options.length }}</strong></span>
+    </div>
+
+    <div class="voting-section" *ngIf="poll.status === 'active' && !hasVoted">
+      <h3>Cast Your Vote</h3>
+      <div class="options-list">
+        <label *ngFor="let option of poll.options" class="option-item">
+          <input 
+            type="radio" 
+            [value]="option.id" 
+            [(ngModel)]="selectedOptionId"
+          />
+          <span class="option-text">{{ option.optionText }}</span>
+        </label>
+      </div>
+
+      <button 
+        class="btn btn-primary btn-large"
+        [disabled]="!selectedOptionId || submitting"
+        (click)="submitVote()"
+      >
+        {{ submitting ? 'Submitting...' : 'Submit Vote' }}
+      </button>
+    </div>
+
+    <div class="voted-message" *ngIf="hasVoted">
+      <div class="alert alert-success">
+        ✓ You have voted on this poll
+      </div>
+      <button 
+        class="btn btn-secondary"
+        (click)="router.navigate(['/polls', poll.id, 'results'])"
+      >
+        View Results
+      </button>
+    </div>
+
+    <div class="closed-message" *ngIf="poll.status === 'closed'">
+      <div class="alert alert-info">
+        This poll is closed. View the results below.
+      </div>
+      <button 
+        class="btn btn-secondary"
+        (click)="router.navigate(['/polls', poll.id, 'results'])"
+      >
+        View Results
+      </button>
+    </div>
+  </div>
+</div>
