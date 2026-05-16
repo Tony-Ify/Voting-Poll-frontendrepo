@@ -1,21 +1,26 @@
-<nav class="navbar">
+<div class="navbar">
   <div class="navbar-container">
     <div class="navbar-brand">
-      <h1> Poll & Voting System</h1>
+      <a routerLink="/" class="brand-text">
+        <span class="emoji">🗳️</span>
+        <span class="text">Poll & Voting</span>
+      </a>
     </div>
 
-    <div class="navbar-menu" *ngIf="isAuthenticated$ | async as isAuth">
-      <div class="navbar-links" *ngIf="isAuth">
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          Dashboard
-        </a>
-        <a routerLink="/profile" routerLinkActive="active">
-          Profile
-        </a>
-        <a routerLink="/admin" routerLinkActive="active">
-          Admin
-        </a>
-      </div>
+    <buttonclass="mobile-menu-toggle" (click)="toggleMobileMenu()"> 
+      <span></span>
+      <span></span>
+      <span></span>
+    
+
+   <div class="nav-menu" [class.active]="menuOpen">
+      <a routerLink="/dashboard" *ngIf="isAuthenticated$ | async">Dashboard</a>
+      <a routerLink="/admin" *ngIf="(isAuthenticated$ | async) && (isAdmin$ | async)">Admin</a>
+      <a routerLink="/profile" *ngIf="isAuthenticated$ | async">Profile</a>
+      <a routerLink="/login" *ngIf="!(isAuthenticated$ | async)">Login</a>
+      <a routerLink="/signup" *ngIf="!(isAuthenticated$ | async)">Sign Up</a>
+      <button (click)="logout()" *ngIf="isAuthenticated$ | async" class="btn btn-secondary">Logout</button>
+    </div>
 
       <div class="navbar-controls">
         <button class="btn-theme" (click)="toggleTheme()" title="Toggle theme">
@@ -23,28 +28,19 @@
           <span *ngIf="(currentTheme$ | async) === 'dark'">☀️</span>
         </button>
 
-        <div class="user-menu" *ngIf="currentUser$ | async as user">
-          <span class="user-name">{{ user.name }}</span>
-          <button class="btn btn-danger" (click)="logout()">Logout</button>
+        <div class="navbar-auth">
+          <div *ngIf="(currentUser$ | async) as user" class="user-section">
+            <span class="user-name">{{ user?.name }}</span>
+            <button class="btn btn-danger" (click)="logout()">Logout</button>
+          </div>
+
+          <div *ngIf="!(isAuthenticated$ | async)" class="guest-auth">
+            <a routerLink="/login" class="btn btn-primary">Login</a>
+            <a routerLink="/signup" class="btn btn-secondary">Sign Up</a>
+          </div>
         </div>
       </div>
     </div>
+  
 
-    <div class="navbar-auth" *ngIf="!(isAuthenticated$ | async)">
-      <button class="btn-theme" (click)="toggleTheme()" title="Toggle theme">
-        <span *ngIf="(currentTheme$ | async) === 'light'">🌙</span>
-        <span *ngIf="(currentTheme$ | async) === 'dark'">☀️</span>
-      </button>
-      <a routerLink="/login" class="btn btn-primary">Login</a>
-      <a routerLink="/signup" class="btn btn-secondary">Sign Up</a>
-    </div>
-  </div>
-</nav>
 
-<main class="container">
-  <router-outlet></router-outlet>
-</main>
-
-<footer class="footer">
-  <p>&copy; 2024 Poll & Voting System. Built with ❤️ for Civic Engagement</p>
-</footer>

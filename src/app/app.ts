@@ -1,33 +1,37 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   title = 'Poll & Voting System';
-  isAuthenticated$ = this.authService.isAuthenticated$;
-  currentUser$ = this.authService.currentUser$;
-  currentTheme$ = this.themeService.theme$;
+  isAuthenticated$!: Observable<boolean>;
+  currentUser$!: Observable<any>;
+  currentTheme$!: Observable<string>;
 
   constructor(
     private authService: AuthService,
     private themeService: ThemeService,
-    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    // Verify token on app load
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
+    this.currentTheme$ = this.themeService.theme$;
     this.authService.verifyToken();
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
   toggleTheme(): void {

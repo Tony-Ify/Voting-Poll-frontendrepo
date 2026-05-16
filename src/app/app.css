@@ -1,9 +1,6 @@
 .main-content {
-  min-height: calc(100vh - 300px);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-:host {
-  display: block;
+  min-height: calc(100vh - 200px);
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }

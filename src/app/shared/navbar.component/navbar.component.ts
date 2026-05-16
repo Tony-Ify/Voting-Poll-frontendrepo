@@ -2,16 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
+import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  isAuthenticated = false;
-  currentUser: User | null = null;
-  currentTheme = 'light';
+  isAuthenticated$!: Observable<boolean>;
+  currentUser$!: Observable<User | null>;
+  currentTheme$!: Observable<string>;
   mobileMenuOpen = false;
 
   constructor(
@@ -21,21 +22,9 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.isAuthenticated$.subscribe(
-      isAuth => (this.isAuthenticated = isAuth),
-    );
-
-    this.authService.currentUser$.subscribe(
-      user => (this.currentUser = user),
-    );
-
-    this.themeService.theme$.subscribe(
-      theme => (this.currentTheme = theme),
-    );
-  }
-
-  toggleTheme(): void {
-    this.themeService.toggleTheme();
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
+    this.currentTheme$ = this.themeService.theme$;
   }
 
   toggleMobileMenu(): void {
@@ -46,6 +35,10 @@ export class NavbarComponent implements OnInit {
     this.mobileMenuOpen = false;
   }
 
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
@@ -53,6 +46,10 @@ export class NavbarComponent implements OnInit {
   }
 
   isAdmin(): boolean {
-    return this.currentUser?.role === 'admin';
+    let isAdmin = false;
+    this.currentUser$.subscribe(user => {
+      isAdmin = user?.role === 'admin';
+    });
+    return isAdmin;
   }
 }

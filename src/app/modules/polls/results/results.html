@@ -1,69 +1,9 @@
 <div class="results-container">
-  <!-- Loading -->
-  <div class="loading" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Loading results...</p>
-  </div>
-
-  <!-- Error -->
-  <div class="alert alert-danger" *ngIf="error && !loading">
-    {{ error }}
-  </div>
-
-  <!-- Results -->
-  <div class="results" *ngIf="results && !loading && poll">
-    <div class="results-header">
-      <div>
-        <h2>{{ poll.title }}</h2>
-        <p class="subtitle">Results</p>
-      </div>
-      <div class="total-votes">
-        <strong>{{ results.totalVotes }}</strong>
-        <span>Total Votes</span>
-      </div>
+  <h2>{{ poll?.title }} - Results</h2>
+  <div class="results">
+    <div *ngFor="let stat of results?.stats" class="result-item">
+      <span>{{ stat.optionText }}: {{ stat.percentage }}% ({{ stat.voteCount }} votes)</span>
+      <div class="bar" [style.width.%]="stat.percentage"></div>
     </div>
-
-    <!-- State Filter -->
-    <div class="filter-section">
-      <label>Filter by State:</label>
-      <select[(ngModel)]="selectedState" (change)="filterByState()" class="form-control">
-        <option value="">All States</option>
-        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
-      </select>
-      <small *ngIf="selectedState" class="filter-info">
-        Showing votes from {{ selectedState }}
-      </small>
-    </div>
-
-    <!-- Results Chart -->
-    <div class="results-chart">
-      <div *ngFor="let stat of results.stats" class="result-item">
-        <div class="result-label">
-          <span class="option-name">{{ stat.optionText }}</span>
-          <span class="vote-info">
-            <strong>{{ stat.voteCount }}</strong>
-            <small>{{ stat.percentage }}%</small>
-          </span>
-        </div>
-        <div class="result-bar">
-          <div class="result-bar-fill" [style.width]="getPercentageBarWidth(stat.percentage)"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Result Details -->
-    <div class="result-details">
-      <p>
-        <small>
-          <strong>{{ results.totalVotes }}</strong> votes cast
-          <span *ngIf="selectedState"> from {{ selectedState }}</span>
-        </small>
-      </p>
-    </div>
-  </div>
-
-  <!-- Back Button -->
-  <div class="actions" *ngIf="!loading">
-    <a routerLink="/dashboard" class="btn btn-secondary">← Back to Polls</a>
   </div>
 </div>
