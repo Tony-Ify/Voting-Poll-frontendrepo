@@ -13,8 +13,9 @@ const STATES = [
 
 @Component({
   selector: 'app-signup',
+  standalone: false,
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.scss'],
+  styleUrls: ['./signup.component.css'],
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;

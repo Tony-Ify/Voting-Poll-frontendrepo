@@ -5,8 +5,9 @@ import { VotesService, PollResults, AllStatesVoteResultsDto } from '../../../ser
 
 @Component({
   selector: 'app-results',
-  templateUrl: './results.component.html',
-  styleUrls: ['./results.component.scss'],
+  standalone: false,
+  templateUrl: './results.html',
+  styleUrls: ['./results.css'],
 })
 export class ResultsComponent implements OnInit {
   poll: Poll | null = null;

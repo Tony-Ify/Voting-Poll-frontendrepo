@@ -5,8 +5,9 @@ import { PollsService } from '../../../services/polls.service';
 
 @Component({
   selector: 'app-poll-management',
-  templateUrl: './poll-management.component.html',
-  styleUrls: ['./poll-management.component.scss'],
+  standalone: false,
+  templateUrl: './poll-management.html',
+  styleUrls: ['./poll-management.css'],
 })
 export class PollManagementComponent implements OnInit {
   pollForm!: FormGroup;

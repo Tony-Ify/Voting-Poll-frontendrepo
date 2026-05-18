@@ -1,16 +1,22 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'navbar',
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
   isAuthenticated$!: Observable<boolean>;
+  isAdmin$!: Observable<boolean>;
   currentUser$!: Observable<User | null>;
   currentTheme$!: Observable<string>;
   mobileMenuOpen = false;
@@ -25,6 +31,9 @@ export class NavbarComponent implements OnInit {
     this.isAuthenticated$ = this.authService.isAuthenticated$;
     this.currentUser$ = this.authService.currentUser$;
     this.currentTheme$ = this.themeService.theme$;
+    this.isAdmin$ = this.authService.currentUser$.pipe(
+      map(user => user?.role === 'admin'),
+    );
   }
 
   toggleMobileMenu(): void {

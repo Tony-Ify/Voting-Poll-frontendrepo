@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-vote-form',
-  templateUrl: './vote-form.component.html',
-  styleUrls: ['./vote-form.component.scss'],
+  standalone: false,
+  templateUrl: './vote-form.html',
+  styleUrls: ['./vote-form.css'],
 })
 export class VoteFormComponent {}

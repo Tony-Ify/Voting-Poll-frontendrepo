@@ -4,8 +4,9 @@ import { PollsService, Poll } from '../../../services/polls.service';
 
 @Component({
   selector: 'app-poll-list',
-  templateUrl: './poll-list.component.html',
-  styleUrls: ['./poll-list.component.scss'],
+  standalone: false,
+  templateUrl: './poll-list.html',
+  styleUrls: ['./poll-list.css'],
 })
 export class PollListComponent implements OnInit {
   polls: Poll[] = [];

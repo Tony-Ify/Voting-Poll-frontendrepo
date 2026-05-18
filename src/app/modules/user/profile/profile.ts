@@ -12,8 +12,9 @@ const STATES = [
 
 @Component({
   selector: 'app-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss'],
+  standalone: false,
+  templateUrl: './profile.html',
+  styleUrls: ['./profile.css'],
 })
 export class ProfileComponent implements OnInit {
   profileForm!: FormGroup;

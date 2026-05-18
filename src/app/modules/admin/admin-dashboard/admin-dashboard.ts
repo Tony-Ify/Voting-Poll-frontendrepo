@@ -4,8 +4,9 @@ import { PollsService, Poll } from '../../../services/polls.service';
 
 @Component({
   selector: 'app-admin-dashboard',
-  templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss'],
+  standalone: false,
+  templateUrl: './admin-dashboard.html',
+  styleUrls: ['./admin-dashboard.css'],
 })
 export class AdminDashboardComponent implements OnInit {
   polls: Poll[] = [];

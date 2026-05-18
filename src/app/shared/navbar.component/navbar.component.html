@@ -7,13 +7,13 @@
       </a>
     </div>
 
-    <buttonclass="mobile-menu-toggle" (click)="toggleMobileMenu()"> 
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
       <span></span>
       <span></span>
       <span></span>
-    
+    </button>
 
-   <div class="nav-menu" [class.active]="menuOpen">
+    <div class="nav-menu" [class.active]="mobileMenuOpen">
       <a routerLink="/dashboard" *ngIf="isAuthenticated$ | async">Dashboard</a>
       <a routerLink="/admin" *ngIf="(isAuthenticated$ | async) && (isAdmin$ | async)">Admin</a>
       <a routerLink="/profile" *ngIf="isAuthenticated$ | async">Profile</a>
@@ -22,25 +22,26 @@
       <button (click)="logout()" *ngIf="isAuthenticated$ | async" class="btn btn-secondary">Logout</button>
     </div>
 
-      <div class="navbar-controls">
-        <button class="btn-theme" (click)="toggleTheme()" title="Toggle theme">
-          <span *ngIf="(currentTheme$ | async) === 'light'">🌙</span>
-          <span *ngIf="(currentTheme$ | async) === 'dark'">☀️</span>
-        </button>
+    <div class="navbar-controls">
+      <button class="btn-theme" (click)="toggleTheme()" title="Toggle theme">
+        <span *ngIf="(currentTheme$ | async) === 'light'">🌙</span>
+        <span *ngIf="(currentTheme$ | async) === 'dark'">☀️</span>
+      </button>
 
-        <div class="navbar-auth">
-          <div *ngIf="(currentUser$ | async) as user" class="user-section">
-            <span class="user-name">{{ user?.name }}</span>
-            <button class="btn btn-danger" (click)="logout()">Logout</button>
-          </div>
-
-          <div *ngIf="!(isAuthenticated$ | async)" class="guest-auth">
-            <a routerLink="/login" class="btn btn-primary">Login</a>
-            <a routerLink="/signup" class="btn btn-secondary">Sign Up</a>
-          </div>
+      <div class="navbar-auth">
+        <div *ngIf="(currentUser$ | async) as user" class="user-section">
+          <span class="user-name">{{ user?.name }}</span>
+          <button class="btn btn-danger" (click)="logout()">Logout</button>
         </div>
+
+        <div *ngIf="!(isAuthenticated$ | async)" class="guest-auth">
+          <a routerLink="/login" class="btn btn-primary">Login</a>
+          <a routerLink="/signup" class="btn btn-secondary">Sign Up</a>
+        </div>*/
       </div>
     </div>
-  
+  </div>
+</div>
+
 
 

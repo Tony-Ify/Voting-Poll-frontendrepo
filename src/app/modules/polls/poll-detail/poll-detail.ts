@@ -6,8 +6,9 @@ import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-poll-detail',
-  templateUrl: './poll-detail.component.html',
-  styleUrls: ['./poll-detail.component.scss'],
+  standalone: false,
+  templateUrl: './poll-detail.html',
+  styleUrls: ['./poll-detail.css'],
 })
 export class PollDetailComponent implements OnInit {
   poll: Poll | null = null;

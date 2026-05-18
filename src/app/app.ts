@@ -4,13 +4,15 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
 import { Observable } from 'rxjs';
+import { NavbarComponent } from './shared/navbar.component/navbar.component';
+import { FooterComponent } from './shared/footer.component/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css'],
 })
 export class AppComponent implements OnInit {
   title = 'Poll & Voting System';
