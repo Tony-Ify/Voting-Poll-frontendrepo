@@ -3,7 +3,7 @@
     <div class="navbar-brand">
       <a routerLink="/" class="brand-text">
         <span class="emoji">🗳️</span>
-        <span class="text">Poll & Voting</span>
+        <span class="text">WEB-Voting</span>
       </a>
     </div>
 
@@ -17,8 +17,7 @@
       <a routerLink="/dashboard" *ngIf="isAuthenticated$ | async">Dashboard</a>
       <a routerLink="/admin" *ngIf="(isAuthenticated$ | async) && (isAdmin$ | async)">Admin</a>
       <a routerLink="/profile" *ngIf="isAuthenticated$ | async">Profile</a>
-      <a routerLink="/login" *ngIf="!(isAuthenticated$ | async)">Login</a>
-      <a routerLink="/signup" *ngIf="!(isAuthenticated$ | async)">Sign Up</a>
+    
       <button (click)="logout()" *ngIf="isAuthenticated$ | async" class="btn btn-secondary">Logout</button>
     </div>
 
@@ -37,7 +36,7 @@
         <div *ngIf="!(isAuthenticated$ | async)" class="guest-auth">
           <a routerLink="/login" class="btn btn-primary">Login</a>
           <a routerLink="/signup" class="btn btn-secondary">Sign Up</a>
-        </div>*/
+        </div>
       </div>
     </div>
   </div>
