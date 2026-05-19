@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 const STATES = [
-  'Lagos', 'Abuja', 'Kano', 'Kaduna', 'Enugu', 'Port Harcourt',
-  'Ibadan', 'Benin City', 'Jos', 'Katsina', 'Owerri', 'Abeokuta',
-  'Osogbo', 'Ilorin', 'Lokoja', 'Akure', 'Calabar', 'Umuahia',
-  'Yenagoa', 'Asaba', 'Maiduguri', 'Gusau', 'Birnin Kebbi', 'Gombe',
-  'Damaturu', 'Makurdi', 'Lafia', 'Bauchi', 'Dutse', 'Federal Capital Territory',
+  'ABIA', 'ADAMAWA', 'AKWA IBOM', 'ANAMBRA', 'BAUCHI', 'BAYELSA', 'BENUE',
+  'BORNO', 'CROSS RIVER', 'DELTA', 'EBONYI', 'EDO', 'EKITI', 'ENUGU',
+  'GOMBE', 'IMO', 'JIGAWA', 'KADUNA', 'KANO', 'KATSINA', 'KEBBI',
+  'KOGI', 'KWARA', 'LAGOS', 'NASARAWA', 'NIGER', 'OGUN', 'ONDO',
+  'OSUN', 'OYO', 'PLATEAU', 'RIVERS', 'SOKOTO', 'TARABA',
+  'YOBE', 'ZAMFARA'
 ];
 
 @Component({
